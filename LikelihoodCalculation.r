@@ -23,6 +23,7 @@ eval(parse(text = paste('IntegratedLikelihoodTreatment',i,
 '<-read.table("',OD,'/IntegratedLikelihoodTreatment_',RoundOfGLUE,'_',i,
 '.txt",header=TRUE,comment.char="")',sep="")));
 ##Read the integrated likelihood values.
+print(RoundOfGLUE)
 
 ColumnNumber<-dim(IntegratedLikelihoodTreatment1);
 
@@ -53,6 +54,10 @@ for (i in 1:TreatmentNumber)
 }
 
 Probability<-CombinedProbability/sum(CombinedProbability);
+print(ProbabilityTreatment1)
+print("CombinedProbability")
+print(CombinedProbability)
+print("CombinedProbability")
 #Calculate the normalized probability values for each of the random parameter sets.
 
 # Step 4. Combine the generated random parameter sets and the final normalized probability together.

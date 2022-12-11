@@ -10,6 +10,7 @@ GenotypeFile<-as.character(ReadLine); #Get the genotype file saved as a template
 LineNumber<-grep(pattern=CultivarID, GenotypeFile); #Get the number of the line where the cultivar "GLUECUL" is located.
 OldLine<-GenotypeFile[LineNumber];#Get the line according to the line number.
 
+print(RunNumber)
 R<-RunNumber;#Get what parameter set will be used to change the genotype file.
 
 # if (CropName != "SC")

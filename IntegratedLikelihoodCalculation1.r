@@ -143,6 +143,10 @@ names(IntegratedCombinedLikelihood)<-"IntegratedCombinedLikelihood" #Set the nam
 
 IntegratedLikelihoodMatrixTable<-cbind(IntegratedLikelihoodMatrixTable,IntegratedCombinedLikelihood)#Add the combined likelihood 1 to the likelihood matrix.
 
+print("IntegratedLikelihoodMatrixTable")
+print(IntegratedLikelihoodMatrixTable) 
+print("IntegratedLikelihoodMatrixTable")
+
 ##Step 5. Distribute the icombined likelihood values of the integrated measurements to each treatment.
 for (i in 1:TreatmentNumber)
 {

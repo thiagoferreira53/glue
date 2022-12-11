@@ -1,6 +1,8 @@
 ##This is the function to run the DSSAT model.
 ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix)
 {
+  print(RandomMatrix)
+  print(RoundOfGLUE)
   eval(parse(text = paste("write('',file='",OD,"/Evaluate_output.txt')",sep = '')));
   #Empty the Evaluate_output.txt file so as to save new data in Evaluate file in each model run.
 
@@ -18,7 +20,7 @@ GenotypeChange(GD, DSSATD, OD, CropName, GenotypeFileName, CultivarID, TotalPara
 setwd(OD);
 #Set the path for program to call the bath file running.
 
-eval(parse(text = paste("system('",DSSATD,"/DSCSM048.EXE ",ModelSelect," B ",OD,"/DSSBatch.v48')",sep = '')));
+eval(parse(text = paste("system('",DSSATD,"/dscsm048 ",ModelSelect," B ","DSSBatch.v48')",sep = '')));
 #Call the bath file to run the model.
 if (file.exists("Evaluate.OUT")== F)
 {

@@ -1,0 +1,9 @@
+{
+    "CultivarBatchFile" : "BRS_264.WHC",
+    "GLUED" : "/Users/thiagoferreira53/Projects/GLUE/",
+    "OutputD" : "/Users/thiagoferreira53/Projects/GLUE/GLWork/",
+    "DSSATD" : "/./",
+    "GenotypeD" : "/Users/thiagoferreira53/DSSAT48/Genotype/",
+    "GLUEFlag" : 3, 
+    "NumberOfModelRun" : 2
+}
