@@ -66,7 +66,6 @@ if(CropName != "SC")
   {
   ParameterFormat<-sprintf('%3.1f', Parameter);
   }
-
   substr(OldLine, ValuePosition1, ValuePosition2)<-ParameterFormat;
   }
 } else
@@ -117,6 +116,11 @@ if(length(NumberOfIllegalCharacters)!=0) CultivarName<-gsub(pattern="/", "_", Cu
                                                  
 eval(parse(text=paste("NewGenotypeFilePath='",OD,"/",CropName,"",CultivarName,".CUL'",sep = '')));
 write(OldLine, file=NewGenotypeFilePath);
+
+#updates the .CUL file
+GenotypeFile[CultivarAddress] <- OldLine
+write(GenotypeFile,paste0(OD,'/',GenotypeFileName,".CUL"))
+
 #Save the new genotype file as "cul" file in the DSSAT directory.
 }
 

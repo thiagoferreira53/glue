@@ -23,7 +23,6 @@ eval(parse(text = paste('IntegratedLikelihoodTreatment',i,
 '<-read.table("',OD,'/IntegratedLikelihoodTreatment_',RoundOfGLUE,'_',i,
 '.txt",header=TRUE,comment.char="")',sep="")));
 ##Read the integrated likelihood values.
-print(RoundOfGLUE)
 
 ColumnNumber<-dim(IntegratedLikelihoodTreatment1);
 
@@ -37,6 +36,12 @@ eval(parse(text = paste('ProbabilityTreatment',i,'[,j]<-IntegratedLikelihoodTrea
 ##Calculate the probability or normalized likelihood values for each observation.
 
 }
+
+print("********************")
+print(ls())
+print("********************")
+print(ProbabilityTreatment1)
+print("********************")
 
 # Step 3. Calculate the combined probability or normalized likelihood values for all treatments.
 
@@ -54,10 +59,7 @@ for (i in 1:TreatmentNumber)
 }
 
 Probability<-CombinedProbability/sum(CombinedProbability);
-print(ProbabilityTreatment1)
-print("CombinedProbability")
-print(CombinedProbability)
-print("CombinedProbability")
+
 #Calculate the normalized probability values for each of the random parameter sets.
 
 # Step 4. Combine the generated random parameter sets and the final normalized probability together.
@@ -83,9 +85,17 @@ eval(parse(text=paste('write.table(as.matrix(RandomParameterSets), file ="',OD,
 eval(parse(text=paste('RandomParameterSets<-read.table("',OD,
 '/RealRandomSets_2.txt", header=FALSE, comment.char="")',sep="")));
 colnames(RandomParameterSets)<-ParameterNames;
+
+print("#############")
+print(RandomParameterSets)
+print("#############")
+print(Probability)
+
 RandomParameterSets<-cbind(RandomParameterSets,Probability);
 #Read the generated radom parameter sets and assign names to them.
-
+print("2 #############")
+print(RandomParameterSets)
+print("2 #############")
 #library ('MASS');
 #eval(parse(text=paste('write.matrix(RandomParameterSets,file ="',OD,
 #'/RandomParameterSetsAndProbability_2.txt")',sep="")));

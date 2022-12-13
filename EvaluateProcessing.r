@@ -8,6 +8,10 @@ FileLength<-length(File);
 
 TitleLine = grep("@RUN",File)
 
+print("%%%%%%%%%%%%%%%")
+print(TitleLine)
+print("%%%%%%%%%%%%%%%")
+
 FrameTitle<-File[TitleLine]
 FrameData<-c();
 ##Read the titles of the predictions, which is located in the 3rd line of the evaluate output.

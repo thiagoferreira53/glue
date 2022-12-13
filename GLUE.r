@@ -22,7 +22,7 @@ CultivarBatchFile<-GLUE_defs$CultivarBatchFile;
 #model output storage directory (OD) and DSSAT (DSSATD).
 WorkDirectory<-getwd();
 
-
+Cores <- GLUE_defs$Cores
 
 #WorkDirectorySubstrings<-unlist(strsplit(WorkDirectory,"DSSAT48"));
 
@@ -264,13 +264,59 @@ RoundOfGLUE<-i;
 ## (1) Generate random values for the paramter set concerned.
 eval(parse(text = paste("source('",WD,"/RandomGeneration.r')",sep = '')));
 RandomMatrix<-RandomGeneration(WD,CulData, TotalParameterNumber, ncol.predefined,NumberOfModelRun, RoundOfGLUE, GLUEFlag);
+write(paste0("GLUE Flag: ", RoundOfGLUE), file = ModelRunIndicatorPath, append = T);
 write("Random parameter sets have been generated...", file = ModelRunIndicatorPath, append = T);
 write("Model runs are starting...", file = ModelRunIndicatorPath, append = T);
 
 ## (2) Create new genotype files with the generated parameter sets and run the DSSAT model with them.
 eval(parse(text = paste("source('",WD,"/ModelRun.r')",sep = '')));
-ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix);
+ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix, Cores);
 write("Model run is finished...", file = ModelRunIndicatorPath, append = T)
+
+EvaluateFiles <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("EvaluateFrame_",RoundOfGLUE,".txt"));
+
+EvaluateOutTxt <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Evaluate_output.txt"));
+
+RealRandomSetsFiles <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("RealRandomSets_",RoundOfGLUE,".txt"));
+print(RealRandomSetsFiles)
+
+EvaluateFrameData <- c();
+
+RealRandomSetsFrame <- c();
+
+for(Eval_out in EvaluateFiles){
+  
+  eval(parse(text=paste("FileE<-readLines('",Eval_out,"',n=-1)",sep = '')));
+  
+  FileLength<-length(FileE);
+  
+  TitleLine = grep("@RUN",FileE);
+  #print(TitleLine)
+  
+  if(Eval_out==EvaluateFiles[1]){
+    EvaluateFrameTitle<-FileE[TitleLine]
+    file.copy(EvaluateOutTxt[1], OD) #doing this just because IntegratedLikelihoodCalculation scripts check the header
+  }
+  
+  File_no_title <- FileE[-TitleLine]; #remove title
+  
+  EvaluateFrameData=append(EvaluateFrameData,File_no_title);
+}
+
+EvaluateFrame<-append(EvaluateFrameTitle, EvaluateFrameData);
+eval(parse(text = paste('write(EvaluateFrame, "',OD,'/EvaluateFrame_',RoundOfGLUE,'.txt", append = T)',sep="")))
+
+for (Rand_out in RealRandomSetsFiles){
+  eval(parse(text=paste("FileRand<-readLines('",Rand_out,"',n=-1)",sep = '')));
+  RealRandomSetsFrame=append(RealRandomSetsFrame,FileRand); 
+}
+
+print("AAAAAAABCCCCCCCCCCC")
+print(RealRandomSetsFrame)
+print("AAAAAAABCCCCCCCCCCC")
+
+eval(parse(text = paste('write(RealRandomSetsFrame, "',OD,'/RealRandomSets_',RoundOfGLUE,'.txt", append = T)',sep="")))
+
 
 write("Likelihood calculation is starting...", file = ModelRunIndicatorPath, append = T);
 
