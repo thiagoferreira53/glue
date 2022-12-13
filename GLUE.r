@@ -1,5 +1,5 @@
 ####The main function to automatically realize the GLUE procedure for parameter estimation for DSSAT model.####
-
+time_test <- Sys.time()
 library(rjson)
 
 #################Step 1: Get the fundamental information for GLUE procedure.##############
@@ -278,7 +278,6 @@ EvaluateFiles <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Evalua
 EvaluateOutTxt <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Evaluate_output.txt"));
 
 RealRandomSetsFiles <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("RealRandomSets_",RoundOfGLUE,".txt"));
-print(RealRandomSetsFiles)
 
 EvaluateFrameData <- c();
 
@@ -310,10 +309,6 @@ for (Rand_out in RealRandomSetsFiles){
   eval(parse(text=paste("FileRand<-readLines('",Rand_out,"',n=-1)",sep = '')));
   RealRandomSetsFrame=append(RealRandomSetsFrame,FileRand); 
 }
-
-print("AAAAAAABCCCCCCCCCCC")
-print(RealRandomSetsFrame)
-print("AAAAAAABCCCCCCCCCCC")
 
 eval(parse(text = paste('write(RealRandomSetsFrame, "',OD,'/RealRandomSets_',RoundOfGLUE,'.txt", append = T)',sep="")))
 
@@ -351,12 +346,5 @@ OptimalParameterSet(GLUEFlag, OD, DSSATD, CropName, CultivarID, CultivarName, Ge
 
 options(show.error.message=T)
 
- 
-
-
-
-
-
-
-
+print(Sys.time()-time_test)
 

@@ -37,12 +37,6 @@ eval(parse(text = paste('ProbabilityTreatment',i,'[,j]<-IntegratedLikelihoodTrea
 
 }
 
-print("********************")
-print(ls())
-print("********************")
-print(ProbabilityTreatment1)
-print("********************")
-
 # Step 3. Calculate the combined probability or normalized likelihood values for all treatments.
 
 for (i in 1:TreatmentNumber)
@@ -86,16 +80,8 @@ eval(parse(text=paste('RandomParameterSets<-read.table("',OD,
 '/RealRandomSets_2.txt", header=FALSE, comment.char="")',sep="")));
 colnames(RandomParameterSets)<-ParameterNames;
 
-print("#############")
-print(RandomParameterSets)
-print("#############")
-print(Probability)
-
 RandomParameterSets<-cbind(RandomParameterSets,Probability);
 #Read the generated radom parameter sets and assign names to them.
-print("2 #############")
-print(RandomParameterSets)
-print("2 #############")
 #library ('MASS');
 #eval(parse(text=paste('write.matrix(RandomParameterSets,file ="',OD,
 #'/RandomParameterSetsAndProbability_2.txt")',sep="")));
