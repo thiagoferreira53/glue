@@ -17,9 +17,11 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
       dir.create(core_dir_name)
       write('',paste0(core_dir_name,'/Evaluate_output.txt'))
       write('',paste0(core_dir_name,'/Run_check_',Sys.getpid(),'.txt'))
-      file.copy(paste0(WD,'/DSSBatch.v48'), core_dir_name)
+      file.copy(paste0(OD,'/DSSBatch.v48'), core_dir_name)
       file.copy(paste0(GD,'/',GenotypeFileName,'.CUL'), core_dir_name)
-      file.copy(paste0(GD,'/',GenotypeFileName,'.CUL'), OD) #add a copy to
+      file.copy(paste0(GD,'/',GenotypeFileName,'.ECO'), core_dir_name) #added to run on HiPerGator
+      file.copy(paste0(GD,'/',GenotypeFileName,'.SPE'), core_dir_name) #added to run on HiPerGator
+      file.copy(paste0(GD,'/',GenotypeFileName,'.CUL'), OD) #adding a copy since GLUE needs to read the header after ModelRun.r
     }
     setwd(core_dir_name);
     #Set the path for program to call the bath file running.
@@ -31,7 +33,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
     GenotypeChange(GD, DSSATD, core_dir_name, CropName, GenotypeFileName, CultivarID, TotalParameterNumber, ModelRunNumber, RandomMatrix); #Change the genotype file.
     
     
-    eval(parse(text = paste("system('",DSSATD,"/dscsm048 ",ModelSelect," B ","DSSBatch.v48')",sep = '')));
+    eval(parse(text = paste("system('",DSSATD,"/dscsm048 ",ModelSelect," B ","DSSBatch.v48 DSCSM048.CTR')",sep = '')));
     
     #Call the bath file to run the model.
     if (file.exists("Evaluate.OUT")== F)
