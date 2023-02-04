@@ -32,21 +32,29 @@ process.
 
 How to use it:
 
-- Create a "GLUE_Defs.json". Find bellow the required strucuture for this .json file.
+- Create a "GLUEDefs.json". This is a configuration file for running GLUE. Find bellow the required strucuture for file.
 
-- Create a .WHC file (similar structure of a batch file) and put in on your working directory.
+- Create a C file (similar structure of a batch file) and put in on your working directory. 
+  RUNNING GLUE IN THE COMMAND LINE WILL NOT AUTOMATICALLY CREATE THE C FILE. You can use GLUESelect to generate the file.
 
 - Check if the cultivar to be calibrated is actually defined inside the .CUL with a unique ID and some initial values for 
   the genotype-specific coefficients. GLUE will use the "MINIMA" and "MAXIMA" inside the cultivar file to estimate the new
   genetic coefficients.
   
-- On the command-line interface (CLI), go to the GLUE directory and run GLUE using the command: "Rscript GLUE.r".
+- On the command-line interface (CLI), go to the GLUE directory and run GLUE using the command: "Rscript GLUE.r" 
+  (GLUE.bat does not work for this version yet).
 
+- Currently, ecotype parameters calibration requires changes in the .ECO structure. For this reason, using the standard 
+  .ECO files from DSSAT will produce errors.
 
-*GLUE_Defs.json File Structure
+*GLUEDefs.json File Structure:
  | CultivarBatchFile - Define the .WHC to be used (the file should be located inside the GLWork folder).
  | ModelID - Inform which model should be used for the calibration (You can find the respective model ID in the 
              DSCSM048.CTR file for more details).
+ | EcoCalibration - Indicates if GLUE should also calibrate the parameters on the respective ecotype (.ECO) file. 
+                    EcoCalibration = "Y", Ecotype parameters will be calibrated as well according to the GLUEFlag 
+                    (phenology and growth parameters) 
+                    EcoCalibration = "" or "N", GLUE wil only calibrate the cultivar parameters
  | GLUED - Define the path for the GLUE directory.
  | OutputD - Define the directory path for the workind directory and cultivar calibration outputs.
  | DSSATD - Define the directory path where DSSAT is located.
@@ -57,7 +65,7 @@ How to use it:
               GLUEFlag = 3, only growth will be evaluated.
  | NumberOfModelRun - Define the number of model runs for each treatment
  | Cores - Indicate the number of cores (CPUs) to be used for running the simulation. If Cores = "", GLUE will assume 
-           that it will calibrate on a High Perfomance Computer (SLURM job scheduler) and use the same amount of cores
+           that it is running on a High Perfomance Computer (SLURM job scheduler) and use the same amount of cores
            specified on through the "--cpus-per-task" command (usually defined in the job request file - .sh).
            *You can use parallel::detectCores() command on R to check the number of cores available.*
            **we do not recommend the use of all available cores in your machine for running GLUE.**

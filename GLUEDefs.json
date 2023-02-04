@@ -1,11 +1,12 @@
 {
-    "CultivarBatchFile" : "BRS_264.WHC",
-    "ModelID" : "CSCRP048",
+    "CultivarBatchFile" : "Prisma_GC_Avg.MZC",
+    "ModelID" : "MZCER048",
+    "EcoCalibration" : "",
     "GLUED" : "/Users/thiagoferreira53/Projects/GLUE/",
     "OutputD" : "/Users/thiagoferreira53/Projects/GLUE/GLWork/",
-    "DSSATD" : "/./",
+    "DSSATD" : "/Users/thiagoferreira53/Projects/GLUE/",
     "GenotypeD" : "/Users/thiagoferreira53/DSSAT48/Genotype/",
     "GLUEFlag" : 3, 
     "NumberOfModelRun" : 100,
-    "Cores" : 10
+    "Cores" : 6
 }

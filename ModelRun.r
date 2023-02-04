@@ -2,7 +2,7 @@ library(iterators)
 library(parallel)
 
 ##This is the function to run the DSSAT model.
-ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix, cores_available)
+ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix, CoresAvailable, EcotypeID, EcotypeParameters)
 {
 
   ListModelRun<- 1:NumberOfModelRun
@@ -30,10 +30,15 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
     ModelRunNumber<- i
     #print(ModelRunNumber)
     eval(parse(text = paste("source('",WD,"/GenotypeChange.r')",sep = '')));#Tell the location of the function.
-    GenotypeChange(GD, DSSATD, core_dir_name, CropName, GenotypeFileName, CultivarID, TotalParameterNumber, ModelRunNumber, RandomMatrix); #Change the genotype file.
+    GenotypeChange(GD, DSSATD, core_dir_name, CropName, GenotypeFileName, CultivarID, TotalParameterNumber, ModelRunNumber, RandomMatrix, EcotypeID, EcotypeParameters); #Change the genotype file.
     
     
-    eval(parse(text = paste("system('",DSSATD,"/dscsm048 ",ModelSelect," B ","DSSBatch.v48 DSCSM048.CTR')",sep = '')));
+    #check which OS GLUE is running in order to run the simulations
+    if(.Platform$OS.type == "windows"){
+      eval(parse(text = paste("system('",DSSATD,"/DSCSM048.EXE ",ModelSelect," B ",OD,"/DSSBatch.v48 DSCSM048.CTR')",sep = '')));
+    }else{
+      eval(parse(text = paste("system('",DSSATD,"/dscsm048 ",ModelSelect," B ","DSSBatch.v48 DSCSM048.CTR')",sep = '')));
+    }
     
     #Call the bath file to run the model.
     if (file.exists("Evaluate.OUT")== F)
@@ -87,7 +92,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
       eval(parse(text = paste("write(t(RealRandomSets), file = '",core_dir_name,"/RealRandomSets_2.txt',,append = T, ncolumns =TotalParameterNumber)",sep = '')));
     }
     
-    }, mc.cores = cores_available)
+    }, mc.cores = CoresAvailable)
 
 }
 
