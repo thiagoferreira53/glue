@@ -1,4 +1,3 @@
-library(iterators)
 library(parallel)
 
 ##This is the function to run the DSSAT model.
@@ -102,6 +101,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
                           'GenotypeFileName', 'CultivarID', 'RoundOfGLUE', 'TotalParameterNumber', 
                           'NumberOfModelRun', 'RandomMatrix', 'EcotypeID', 'EcotypeParameters'))
     parLapply(NULL, ListModelRun, function(z) run_simulations(z))
+    stopCluster(cl)
 
 }
 

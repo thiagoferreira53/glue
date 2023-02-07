@@ -24,50 +24,58 @@ for that cultivar. More information can be found on the User Guideline documenta
 This version of DSSAT-GLUE was developed using a parallel computing approach to improve computer performance and 
 significantly reduce the time required for estimating the genotype-specific coefficients. The original code was 
 modified to break down the total number of simulations into parts according to the number of cores (CPUs) available.
-Each individual core process the simulations independently and the results are combined afterwards to evaluate which
+Each core process the simulations independently, and the results are combined afterward to evaluate which
 combination of genotype-specific coefficients had the best performance based on the data used in the estimation 
 process.
 
-**For this version, R library "parallel", "rjson" and depencies are required**
+**For this version, R library "parallel", "rjson" and depencies are required (GLUE will automatically download).**
 
 How to use it:
 
-- Create a "GLUEDefs.json". This is a configuration file for running GLUE. Find bellow the required strucuture for file.
+- Create a "GLUEDefs.json" file. This is a configuration file for running GLUE. Find below the required structure 
+  for the file.
 
-- Create a C file (similar structure of a batch file) and put in on your working directory. 
-  RUNNING GLUE IN THE COMMAND LINE WILL NOT AUTOMATICALLY CREATE THE C FILE. You can use GLUESelect to generate the file.
+- Create a C file (similar to a batch file) and put it in your working directory. 
+  RUNNING THIS GLUE VERSION IN THE COMMAND LINE WILL NOT CREATE THE C FILE. (Tip: Use GLUESelect to generate the file).
 
-- Check if the cultivar to be calibrated is actually defined inside the .CUL with a unique ID and some initial values for 
-  the genotype-specific coefficients. GLUE will use the "MINIMA" and "MAXIMA" inside the cultivar file to estimate the new
-  genetic coefficients.
+- Check if the cultivar to be calibrated is actually defined inside the .CUL with a unique ID and some initial values
+  for the genotype-specific coefficients. GLUE will use the "MINIMA" and "MAXIMA" inside the cultivar/ecotype file to 
+  estimate the new genetic coefficients. Also, make sure that your genotype files have a "!Calibration" line 
+  identifying which coefficients are related to phenology ("P"), growth ("G"), and not applicable ("N").
   
-- On the command-line interface (CLI), go to the GLUE directory and run GLUE using the command: "Rscript GLUE.r" 
-  (GLUE.bat does not work for this version yet).
+- On the command-line interface (CLI), go to the GLUE directory and run GLUE using the command: "Rscript GLUE.r". 
+  *GLUE.bat is not currently working with this version*
+  *Windows users should specify the full path to Rscript (Usually located in C:\Program Files\R\...\bin\Rscript.exe)
 
-- Currently, ecotype parameters calibration requires changes in the .ECO structure. For this reason, using the standard 
-  .ECO files from DSSAT will produce errors.
+- Currently, ecotype coefficient calibration requires changes in the .ECO structure. For this reason, trying to 
+  calibrate ecotype coefficients using the standard .ECO files from DSSAT will produce errors.
+  
+- To save previous runs, please move the results to another folder or create a folder named "BackUp" inside your output 
+  directory (usually defined as GLWork).
+  *ALL DATA INSIDE THE OUTPUT DIRECTORY BESIDES THE "BackUp" folder and .C FILE WILL BE DELETED AT THE START OF A NEW
+  GLUE CALIBRATION RUN*
 
 *GLUEDefs.json File Structure:
  | CultivarBatchFile - Define the .WHC to be used (the file should be located inside the GLWork folder).
- | ModelID - Inform which model should be used for the calibration (You can find the respective model ID in the 
-             DSCSM048.CTR file for more details).
- | EcoCalibration - Indicates if GLUE should also calibrate the parameters on the respective ecotype (.ECO) file. 
-                    EcoCalibration = "Y", Ecotype parameters will be calibrated as well according to the GLUEFlag 
-                    (phenology and growth parameters) 
-                    EcoCalibration = "" or "N", GLUE wil only calibrate the cultivar parameters
+ | ModelID - Inform which model should be used for the calibration (Tip: All model IDs can be found in the DSCSM048.CTR).
+ | EcoCalibration - Indicates if GLUE should also calibrate the coefficients on the respective ecotype (.ECO) file. 
+                    EcoCalibration = "Y" indicates that GLUE should also calibrate the Ecotype coefficients for this 
+                    cultivar. The .ECO file MUST be well structured with "MAXIMA" and "MINIMA" and each coefficient
+                    MUST contain a header indicating whether it is associated with phenology ("P"), growth ("G"), or 
+                    not applicable ("N").
  | GLUED - Define the path for the GLUE directory.
- | OutputD - Define the directory path for the workind directory and cultivar calibration outputs.
+ | OutputD - Define the directory path for the working directory and cultivar calibration outputs.
  | DSSATD - Define the directory path where DSSAT is located.
  | GenotypeD - Define the directory path where the genotype-related files are located (.CUL, .ECO, .SPE).
- | GLUEFlag - Define the flag for whold GLUE procedure. 
-              GLUEFlag = 1, it means that coefficients related both to phenology and growth will be evaluated; 
+ | GLUEFlag - Define the flag for GLUE procedure. 
+              GLUEFlag = 1, both coefficients related to phenology and growth will be evaluated; 
               GLUEFlag = 2, only phenology will be evaluated; 
-              GLUEFlag = 3, only growth will be evaluated.
- | NumberOfModelRun - Define the number of model runs for each treatment
- | Cores - Indicate the number of cores (CPUs) to be used for running the simulation. If Cores = "", GLUE will assume 
+              GLUEFlag = 3, only growth will be evaluated;
+ | NumberOfModelRun - Define the number of model runs for each treatment.
+ | Cores - Indicate the number of cores (CPUs) to run the coefficient calibration. If Cores = "", GLUE will assume 
            that it is running on a High Perfomance Computer (SLURM job scheduler) and use the same amount of cores
            specified on through the "--cpus-per-task" command (usually defined in the job request file - .sh).
-           *You can use parallel::detectCores() command on R to check the number of cores available.*
-           **we do not recommend the use of all available cores in your machine for running GLUE.**
-           
-           
+           *Use "parallel::detectCores()" command in R or RStudio to check the number of cores available.*
+           **We do not recommend the use of all available cores in your machine for running GLUE.**
+
+  **Windows users should not add "/" at the end of each path in the GLUEDefs.json**

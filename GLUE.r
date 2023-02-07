@@ -1,14 +1,12 @@
 ####The main function to automatically realize the GLUE procedure for parameter estimation for DSSAT model.####
 time_test <- Sys.time()
 
-list.of.packages <- c("rjson", "stringr", "parallel", "iterators")
+list.of.packages <- c("rjson", "parallel")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 
 library(rjson)
-library(stringr)
 library(parallel)
-library(iterators)
 
 #################Step 1: Get the fundamental information for GLUE procedure.##############
 ncol(finf <- file.info(dir()))# at least six
@@ -418,16 +416,29 @@ eval(parse(text = paste("source('",WD,"/ModelRun.r')",sep = '')));
 ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix, Cores, EcotypeID, EcotypeParameters);
 write("Model run is finished...", file = ModelRunIndicatorPath, append = T)
 
-EvaluateFiles <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("EvaluateFrame_",RoundOfGLUE,".txt"));
+#List every EvaluateFrame file in the output folder
+listEvalFrame <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("EvaluateFrame_",RoundOfGLUE,".txt"));
 
-EvaluateOutTxt <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Evaluate_output.txt"));
+#Select only EvaluateFrame files in "../GLWork/core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
+EvaluateFiles <- listEvalFrame[grepl("GLWork/core", listEvalFrame)]
 
-RealRandomSetsFiles <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("RealRandomSets_",RoundOfGLUE,".txt"));
+#List every Evaluate_output.txt in the output folder
+listEvaluateOut <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Evaluate_output.txt"));
+
+#Select only Evaluate_output.txt files in "../GLWork/core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
+EvaluateOutTxt <- listEvaluateOut[grepl("GLWork/core", listEvaluateOut)]
+
+#List every RealRandomSets file in the output folder
+listRealRandomSets <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("RealRandomSets_",RoundOfGLUE,".txt"));
+
+#Select only RealRandomSets files in "../GLWork/core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
+RealRandomSetsFiles <- listRealRandomSets[grepl("GLWork/core", listRealRandomSets)]
 
 EvaluateFrameData <- c();
 
 RealRandomSetsFrame <- c();
 
+#Merge the simulation results from each core
 for(Eval_out in EvaluateFiles){
   
   eval(parse(text=paste("FileE<-readLines('",Eval_out,"',n=-1)",sep = '')));
