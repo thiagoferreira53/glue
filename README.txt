@@ -75,7 +75,9 @@ How to use it:
  | Cores - Indicate the number of cores (CPUs) to run the coefficient calibration. If Cores = "", GLUE will assume 
            that it is running on a High Perfomance Computer (SLURM job scheduler) and use the same amount of cores
            specified on through the "--cpus-per-task" command (usually defined in the job request file - .sh).
-           *Use "parallel::detectCores()" command in R or RStudio to check the number of cores available.*
+           *Use "parallel::detectCores()" command in R or RStudio to check the number of cores available. When 
+           requesting more cores than what is actually available, GLUE will use the maximum number of cores - 1 to
+           execute the calibration.*
            **We do not recommend the use of all available cores in your machine for running GLUE.**
 
   **Windows users should not add "/" at the end of each path in the GLUEDefs.json**

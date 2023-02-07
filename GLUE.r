@@ -72,9 +72,18 @@ unlink(setdiff(list.files(OD, full.names = TRUE),
                     list.files(OD, pattern='*C$|BackUp', full.names = TRUE)), 
             recursive = TRUE)
 }else{
-  errorMsg <- paste0("The output folder cannot be the same as the GLUE working directory. Please inform a different output folder path.")
-  write(errorMsg, file = glueWarningLogFile, ncolumns=1, append = T);
-  stop(errorMsg)
+  warningMsg <- "The output folder cannot be the same as the GLUE working directory. Please inform a different output folder path."
+  write(warningMsg, file = glueWarningLogFile, ncolumns=1, append = T);
+  stop(warningMsg)
+}
+
+#Check if the number of cores requested is higher than the actually number of cores available. 
+#If that is the case, GLUE will use the maximum number of cores - 1
+detectedCores <- parallel::detectCores()
+if(Cores > detectedCores){
+  Cores <- detectedCores - 1
+  warningMsg <- paste0("Requested more cores than what is actually available. This machine has ", detectedCores, " cores. GLUE will use ", Cores, " cores.")
+  write(warningMsg, file = glueWarningLogFile, ncolumns=1, append = T);
 }
 
 ##WD represents working directory. This is very important, because it is used to tell the main funtion where
