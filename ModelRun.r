@@ -34,9 +34,9 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
     
     #check which OS GLUE is running in order to run the simulations
     if(.Platform$OS.type == "windows"){
-      eval(parse(text = paste("system('",DSSATD,"/DSCSM048.EXE "," B ",OD,"/DSSBatch.v48 DSCSM048.CTR')",sep = '')));
+      eval(parse(text = paste("system('",DSSATD,"/DSCSM048.EXE ",ModelSelect," B ",OD,"/DSSBatch.v48 DSCSM048.CTR')",sep = '')));
     }else{
-      eval(parse(text = paste("system('",DSSATD,"/dscsm048 "," B ","DSSBatch.v48 DSCSM048.CTR')",sep = '')));
+      eval(parse(text = paste("system('",DSSATD,"/dscsm048 ",ModelSelect," B ","DSSBatch.v48 DSCSM048.CTR')",sep = '')));
     }
     
     #Call the bath file to run the model.
@@ -98,7 +98,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
     
     cl <- makePSOCKcluster(CoresAvailable)
     setDefaultCluster(cl)
-    clusterExport(NULL, c('run_simulations','WD', 'OD', 'DSSATD', 'GD', 'CropName', 
+    clusterExport(NULL, c('ModelSelect', 'run_simulations','WD', 'OD', 'DSSATD', 'GD', 'CropName', 
                           'GenotypeFileName', 'CultivarID', 'RoundOfGLUE', 'TotalParameterNumber', 
                           'NumberOfModelRun', 'RandomMatrix', 'EcotypeID', 'EcotypeParameters'))
     parLapply(NULL, ListModelRun, function(z) run_simulations(z))

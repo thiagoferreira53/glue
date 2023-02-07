@@ -69,10 +69,15 @@ glueExcludedModelListFile <- file.path(WD, "GlueExcludedModels.csv");
 ##Path of the model run indicator file, which indicates which component of GLUE is finished so far.
 
 #command to clean the GLWork directory -- removes everything but the folder BackUp and batch file
+if(OD != WD){
 unlink(setdiff(list.files(OD, full.names = TRUE), 
                     list.files(OD, pattern='*C$|BackUp', full.names = TRUE)), 
             recursive = TRUE)
-
+}else{
+  errorMsg <- paste0("The output folder cannot be the same as the GLUE working directory. Please inform a different output folder path.")
+  write(errorMsg, file = glueWarningLogFile, ncolumns=1, append = T);
+  stop(errorMsg)
+}
 
 ##WD represents working directory. This is very important, because it is used to tell the main funtion where
 ##the sub-functions are. DSSATD represents the DSSAT directory. GLUED represents the GLUE directory.
@@ -499,10 +504,12 @@ print(Sys.time()-time_test)
     errorMsg<- paste0("*** An error occurred during the calibration. Please check your input data. ***\nR error message:\n", e);
     write(errorMsg, file = glueWarningLogFile, append = T);
     cat(errorMsg);
-    if(ECTR == TRUE){    
-      writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
-    }else{
-      file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
+    if(OD != WD){
+      if(ECTR == TRUE){    
+        writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
+      }else{
+        file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
+      }
     }
   }
 )
