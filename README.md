@@ -80,4 +80,8 @@ How to use it:
            execute the calibration.*
            **We do not recommend the use of all available cores in your machine for running GLUE.**
 
-  **Windows users should not add "/" at the end of each path in the GLUEDefs.json**
+  **IMPORTANT**
+  - Do not add "/" at the end of each path in the GLUEDefs.json
+
+  **Windows users**
+  - Use "/" instead of "\" when writing the paths in the .json file (R and the .json file will not run with "\")
