@@ -428,20 +428,20 @@ write("Model run is finished...", file = ModelRunIndicatorPath, append = T)
 #List every EvaluateFrame file in the output folder
 listEvalFrame <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("EvaluateFrame_",RoundOfGLUE,".txt"));
 
-#Select only EvaluateFrame files in "../GLWork/core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
-EvaluateFiles <- listEvalFrame[grepl("GLWork/core", listEvalFrame)]
+#Select only EvaluateFrame files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
+EvaluateFiles <- listEvalFrame[grepl(paste0(OD,"/core"), listEvalFrame)]
 
 #List every Evaluate_output.txt in the output folder
 listEvaluateOut <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Evaluate_output.txt"));
 
-#Select only Evaluate_output.txt files in "../GLWork/core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
-EvaluateOutTxt <- listEvaluateOut[grepl("GLWork/core", listEvaluateOut)]
+#Select only Evaluate_output.txt files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
+EvaluateOutTxt <- listEvaluateOut[grepl(paste0(OD,"/core"), listEvaluateOut)]
 
 #List every RealRandomSets file in the output folder
 listRealRandomSets <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("RealRandomSets_",RoundOfGLUE,".txt"));
 
-#Select only RealRandomSets files in "../GLWork/core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
-RealRandomSetsFiles <- listRealRandomSets[grepl("GLWork/core", listRealRandomSets)]
+#Select only RealRandomSets files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
+RealRandomSetsFiles <- listRealRandomSets[grepl(paste0(OD,"/core"), listRealRandomSets)]
 
 EvaluateFrameData <- c();
 

@@ -56,7 +56,7 @@ How to use it:
   GLUE CALIBRATION RUN*
 
 *GLUEDefs.json File Structure:
- | CultivarBatchFile - Define the .WHC to be used (the file should be located inside the GLWork folder).
+ | CultivarBatchFile - Define the file C (batch) to be used (the file should be located inside the GLWork/working directory).
  | ModelID - Inform which model should be used for the calibration (Tip: All model IDs can be found in the DSCSM048.CTR).
  | EcoCalibration - Indicates if GLUE should also calibrate the coefficients on the respective ecotype (.ECO) file. 
                     EcoCalibration = "Y" indicates that GLUE should also calibrate the Ecotype coefficients for this 
