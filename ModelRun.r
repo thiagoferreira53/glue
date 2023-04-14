@@ -1,11 +1,12 @@
 library(parallel)
 
 ##This is the function to run the DSSAT model.
-ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix, CoresAvailable, EcotypeID, EcotypeParameters)
+ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, 
+                   NumberOfModelRun, RandomMatrix, CoresAvailable, EcotypeID, EcotypeParameters, ModelSelect, CTR)
 {
-
+  CTR
   ListModelRun<- 1:NumberOfModelRun
-
+  
   ParameterSetIndex<-c();
 
   run_simulations <<- function(i) {
@@ -20,6 +21,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
       file.copy(paste0(GD,'/',GenotypeFileName,'.ECO'), core_dir_name) #added to run on HiPerGator
       file.copy(paste0(GD,'/',GenotypeFileName,'.SPE'), core_dir_name) #added to run on HiPerGator
       file.copy(paste0(GD,'/',GenotypeFileName,'.CUL'), OD) #adding a copy since GLUE needs to read the header after ModelRun.r
+      writeLines(CTR,paste0(core_dir_name,"/DSCSM048.CTR")) #writing control file in each core directory
     }
     setwd(core_dir_name);
     #Set the path for program to call the bath file running.
@@ -89,8 +91,8 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
       RealRandomSets<-RandomMatrix[ParameterSetIndex,];
       eval(parse(text = paste("write(t(RealRandomSets), file = '",core_dir_name,"/RealRandomSets_2.txt',,append = T, ncolumns =TotalParameterNumber)",sep = '')));
     }
-    
-    }
+
+  }
     
     #
     #mclapply(ListModelRun, run_simulations, mc.cores = CoresAvailable)

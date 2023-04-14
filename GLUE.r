@@ -69,7 +69,7 @@ glueExcludedModelListFile <- file.path(WD, "GlueExcludedModels.csv");
 #command to clean the GLWork directory -- removes everything but the folder BackUp and batch file
 if(OD != WD){
 unlink(setdiff(list.files(OD, full.names = TRUE), 
-                    list.files(OD, pattern='*C$|BackUp', full.names = TRUE)), 
+                    list.files(OD, pattern='*C$|BackUp|dscsm048', full.names = TRUE)), 
             recursive = TRUE)
 }else{
   warningMsg <- "The output folder cannot be the same as the GLUE working directory. Please inform a different output folder path."
@@ -191,11 +191,10 @@ CTR_file_GLUE <- readLines(paste0(WD,"/DSSCTR.template"))
 
 #Check if there is already a DSCSM048.CTR inside the folder and save it.
 
-ECTR <- file.exists(paste0(DSSATD,"/DSCSM048.CTR"))
-
-if (ECTR == TRUE){
-  CTR_file_Original <- readLines(paste0(DSSATD,"/DSCSM048.CTR"))
-}
+#ECTR <- file.exists(paste0(DSSATD,"/DSCSM048.CTR"))
+#if (ECTR == TRUE){
+#  CTR_file_Original <- readLines(paste0(DSSATD,"/DSCSM048.CTR"))
+#}
 
 #Copy the template for applying the modifications
 CTR <- CTR_file_GLUE
@@ -206,7 +205,7 @@ LineSplit = unlist(strsplit(CTR[LineNo]," "))
 
 LineSplit[length(LineSplit)] <- gsub("\\d+", "",GLUE_defs$ModelID)
 CTR[LineNo] <- paste(LineSplit, collapse=' ')
-writeLines(CTR,paste0(DSSATD,"/DSCSM048.CTR"))
+#writeLines(CTR,paste0(DSSATD,"/DSCSM048.CTR"))
 
 ModelSelect <- GLUE_defs$ModelID
 
@@ -422,7 +421,8 @@ write("Model runs are starting...", file = ModelRunIndicatorPath, append = T);
 
 ## (2) Create new genotype files with the generated parameter sets and run the DSSAT model with them.
 eval(parse(text = paste("source('",WD,"/ModelRun.r')",sep = '')));
-ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, NumberOfModelRun, RandomMatrix, Cores, EcotypeID, EcotypeParameters);
+ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, 
+          NumberOfModelRun, RandomMatrix, Cores, EcotypeID, EcotypeParameters, ModelSelect, CTR);
 write("Model run is finished...", file = ModelRunIndicatorPath, append = T)
 
 #List every EvaluateFrame file in the output folder
@@ -512,26 +512,24 @@ options(show.error.message=T)
 
 #If a DSCSM048.CTR previously existed in the dir, GLUE will put the original back in the folder.
 #Otherwise, it will only delete the DSCSM048.CTR that was created for the calibration.
-if(ECTR == TRUE){  
-  writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
-}else{
-  file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
-}
+#if(ECTR == TRUE){  
+#  writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
+#}else{
+#  file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
+#}
 
 print(Sys.time()-time_test)
 
 },error = function(e) {
-    errorMsg<- paste0("*** An error occurred during the calibration. Please check your input data. ***\nR error message:\n", e);
+    errorMsg<- paste0("*** An error occurred during the calibration. ***\nR error message:\n", e);
     write(errorMsg, file = glueWarningLogFile, append = T);
     cat(errorMsg);
-    if(OD != WD){
-      if(ECTR == TRUE){    
-        writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
-      }else{
-        file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
-      }
-    }
+#    if(OD != WD){
+#      if(ECTR == TRUE){    
+#        writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
+#      }else{
+#        file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
+#      }
+#    }
   }
 )
-
-
