@@ -252,6 +252,20 @@ write(c("DSSAT batch file =",CultivarBatchFile), file = ModelRunIndicatorPath, n
 
 ## (7) Get the parameter property file (miminum, maximum, and flg values) and the number of parameters.
 CulFile.origin= readLines(paste0(GD,"/",GenotypeFileName,".CUL"), encoding="UTF-8")
+
+if(length(grep("999991 MINIMA", CulFile.origin)) == 0){
+  errorMsg <- "Lower bound (MINIMA) not specified in the cultivar file. Please correct the file."
+  return(NULL)
+}
+if(length(grep("999992 MAXIMA", CulFile.origin)) == 0){
+  errorMsg <- "Upper bound (MAXIMA) not specified in the cultivar file. Please correct the file."
+  return(NULL)
+}
+if(length(grep("!Calibration", CulFile.origin)) == 0){
+  errorMsg <- "Missing the calibration switches (P/G/N) in the cultivar file. Please correct the file."
+  return(NULL)
+}
+
 caliLine = CulFile.origin[which(substr(CulFile.origin,1,12) == "!Calibration")]
 CulFile = CulFile.origin[-which(substr(CulFile.origin,1,1) == "!")] #ignore lines starting with !
 CulFile = c(CulFile,caliLine)
@@ -340,6 +354,20 @@ if(EcotypeCalibration == "Y"){
   EcotypeID <- CulData$`ECO#`[3]
   
   Eco.File.origin= readLines(paste0(GD,"/",GenotypeFileName,".ECO"), encoding="UTF-8")
+  
+  if(length(grep("999991 MINIMA", Eco.File.origin)) == 0){
+    errorMsg <- "Lower bound (MINIMA) not specified in the ecotype file. Please correct the file."
+    return(NULL)
+  }
+  if(length(grep("999992 MAXIMA", Eco.File.origin)) == 0){
+    errorMsg <- "Upper bound (MAXIMA) not specified in the ecotype file. Please correct the file."
+    return(NULL)
+  }
+  if(length(grep("!Calibration", Eco.File.origin)) == 0){
+    errorMsg <- "Missing the calibration switches (P/G/N) in the ecotype file. Please correct the file."
+    return(NULL)
+  }
+  
   Eco.CaliLine = Eco.File.origin[which(substr(Eco.File.origin,1,12) == "!Calibration")]
   EcoFile = Eco.File.origin[-which(substr(Eco.File.origin,1,1) == "!")] #ignore lines starting with !
   EcoFile = c(EcoFile,Eco.CaliLine)
@@ -521,9 +549,13 @@ options(show.error.message=T)
 print(Sys.time()-time_test)
 
 },error = function(e) {
-    errorMsg<- paste0("*** An error occurred during the calibration. ***\nR error message:\n", e);
-    write(errorMsg, file = glueWarningLogFile, append = T);
-    cat(errorMsg);
+    fail_run<- paste0("\nAn error occurred during the calibration.\n", errorMsg,"\n")
+    
+    #Appending R error msg for debugging
+    #fail_run<- paste0(fail_run, "\n***\nR error message:\n", e)
+    
+    write(fail_run, file = glueWarningLogFile, append = T)
+    message(fail_run)
 #    if(OD != WD){
 #      if(ECTR == TRUE){    
 #        writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
