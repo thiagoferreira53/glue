@@ -9,12 +9,12 @@ library(rjson)
 library(parallel)
 
 #################Step 1: Get the fundamental information for GLUE procedure.##############
-ncol(finf <- file.info(dir()))# at least six
+#ncol(finf <- file.info(dir()))# at least six
 ## Not run: finf # the whole list
 ## Those that are more than 100 days old :
-finf[difftime(Sys.time(), finf[,"mtime"], units="days") > 100 , 1:4]
+#finf[difftime(Sys.time(), finf[,"mtime"], units="days") > 100 , 1:4]
 
-file.info("no-such-file-exists")
+#file.info("no-such-file-exists")
 
 tryCatch({
 
@@ -471,9 +471,17 @@ listRealRandomSets <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("R
 #Select only RealRandomSets files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
 RealRandomSetsFiles <- listRealRandomSets[grepl(paste0(OD,"/core"), listRealRandomSets)]
 
+#List every Error_list file in the output folder
+listErrorFrame <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Error_list_*"));
+
+#Select only Error_list files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
+ErrorFiles <- listErrorFrame[grepl(paste0(OD,"/core"), listErrorFrame)]
+
 EvaluateFrameData <- c();
 
 RealRandomSetsFrame <- c();
+
+ErrorFrame <- c();
 
 #Merge the simulation results from each core
 for(Eval_out in EvaluateFiles){
@@ -505,6 +513,12 @@ for (Rand_out in RealRandomSetsFiles){
 
 eval(parse(text = paste('write(RealRandomSetsFrame, "',OD,'/RealRandomSets_',RoundOfGLUE,'.txt", append = T)',sep="")))
 
+for (Error_out in ErrorFiles){
+  eval(parse(text=paste("FileError<-suppressWarnings({readLines('",Error_out,"',n=-1)})",sep = '')));
+  ErrorFrame=append(ErrorFrame,FileError); 
+}
+
+eval(parse(text = paste('write(ErrorFrame, "',OD,'/ErrorFrame_',RoundOfGLUE,'.txt", append = T)',sep="")))
 
 write("Likelihood calculation is starting...", file = ModelRunIndicatorPath, append = T);
 
@@ -549,19 +563,22 @@ options(show.error.message=T)
 print(Sys.time()-time_test)
 
 },error = function(e) {
-    fail_run<- paste0("\nAn error occurred during the calibration.\n", errorMsg,"\n")
+    fail_run<- paste0("\nAn error occurred during the calibration.\n")
+    if(exists("errorMsg") == TRUE){
+      fail_run <- paste0(fail_run, errorMsg,"\n")
+    }
     
     #Appending R error msg for debugging
     #fail_run<- paste0(fail_run, "\n***\nR error message:\n", e)
     
     write(fail_run, file = glueWarningLogFile, append = T)
-    message(fail_run)
-#    if(OD != WD){
-#      if(ECTR == TRUE){    
-#        writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
-#      }else{
-#        file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
-#      }
-#    }
+    message(paste0(fail_run, e,"\n"))
+    if(OD != WD){
+      if(ECTR == TRUE){    
+        writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
+      }else{
+        file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
+      }
+    }
   }
 )
