@@ -573,12 +573,12 @@ print(Sys.time()-time_test)
     
     write(fail_run, file = glueWarningLogFile, append = T)
     message(paste0(fail_run, e,"\n"))
-    if(OD != WD){
-      if(ECTR == TRUE){    
-        writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
-      }else{
-        file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
-      }
-    }
+    #if(OD != WD){
+    #  if(ECTR == TRUE){    
+    #    writeLines(CTR_file_Original,paste0(DSSATD,"/DSCSM048.CTR"));
+    #  }else{
+    #    file.remove(paste0(DSSATD,"/DSCSM048.CTR"));
+    #  }
+    #}
   }
 )
