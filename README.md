@@ -10,6 +10,13 @@
                                     
 #####################################################################################################################
 
+#####################################################################################################################
+#Contact Information:
+#Thiago Berton Ferreira   <t.berton@ufl.edu>
+#Gerrit Hoogenboom        <gerrit@ufl.edu>
+#Cheryl Porter            <cporter@ufl.edu>
+#####################################################################################################################
+
 The GLUE (Generalized Likelihood Uncertainty Estimation) program is used to estimate genotype-specific coefficients 
 for the DSSAT crop models. It is a Bayesian estimation method that uses Monte Carlo sampling from prior distributions 
 of the coefficients and a Gaussian likelihood function to determine the best coefficients based on the data that are 
@@ -36,7 +43,7 @@ How to use it:
   for the file.
 
 - Create a C file (similar to a batch file) and put it in your working directory. 
-  RUNNING THIS GLUE VERSION IN THE COMMAND LINE WILL NOT CREATE THE C FILE. (Tip: Use GLUESelect to generate the file).
+  RUNNING THIS GLUE VERSION IN THE COMMAND LINE WILL NOT CREATE THE C FILE (Tip: Use GLUESelect to generate the file).
 
 - Check if the cultivar to be calibrated is actually defined inside the .CUL with a unique ID and some initial values
   for the genotype-specific coefficients. GLUE will use the "MINIMA" and "MAXIMA" inside the cultivar/ecotype file to 
@@ -52,9 +59,13 @@ How to use it:
   
 - To save previous runs, please move the results to another folder or create a folder named "BackUp" inside your output 
   directory (usually defined as GLWork).
-  *ALL DATA INSIDE THE OUTPUT DIRECTORY BESIDES THE "BackUp" folder and .C FILE WILL BE DELETED AT THE START OF A NEW
-  GLUE CALIBRATION RUN*
-
+  
+  
+  **********************************************************************************************************************
+  ALL DATA INSIDE THE OUTPUT DIRECTORY BESIDES THE "BackUp" FOLDER AND CALIBRATION FILES (..C EXTENSION) WILL BE DELETED 
+  AT THE START OF A NEW CULTIVAR CALIBRATION. MAKE SURE TO MOVE ANY PREVIOUS RESULTS TO THE BackUp folder 
+  **********************************************************************************************************************
+  
 *GLUEDefs.json File Structure:
  | CultivarBatchFile - Define the file C (batch) to be used (the file should be located inside the GLWork/working directory).
  | ModelID - Inform which model should be used for the calibration (Tip: All model IDs can be found in the DSCSM048.CTR).
@@ -81,7 +92,9 @@ How to use it:
            **We do not recommend the use of all available cores in your machine for running GLUE.**
 
   **IMPORTANT**
-  - Do not add "/" at the end of each path in the GLUEDefs.json
+  - Do not add "/" at the end of each path in the GLUEDefs.json;
+  - The size of the soil profile file (e.g. .SOL) has an impact in the time required to run the cultivar calibration.
+    It is recommended to create a soil file with only the profiles being used during the calibration;
 
   **Windows users**
-  - Use "/" instead of "\" when writing the paths in the .json file (R and the .json file will not run with "\")
+  - Use "/" instead of "\" when writing the paths in the .json file (R and the .json file will not run with "\");

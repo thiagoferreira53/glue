@@ -1,6 +1,6 @@
 ####The main function to automatically realize the GLUE procedure for parameter estimation for DSSAT model.####
 time_test <- Sys.time()
-
+print(paste0("Calibration started at ", time_test))
 list.of.packages <- c("rjson", "parallel")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
@@ -447,11 +447,22 @@ write(paste0("GLUE Flag: ", RoundOfGLUE), file = ModelRunIndicatorPath, append =
 write("Random parameter sets have been generated...", file = ModelRunIndicatorPath, append = T);
 write("Model runs are starting...", file = ModelRunIndicatorPath, append = T);
 
+calib_var <- "empty"
+if(RoundOfGLUE == 1){
+  calib_var <- "Phenology"
+}else{
+  calib_var <- "Growth"
+}
+
+print(paste0("GLUE Flag: ", RoundOfGLUE," - ", calib_var));
+print(paste0("Model runs are starting..."));
+
 ## (2) Create new genotype files with the generated parameter sets and run the DSSAT model with them.
 eval(parse(text = paste("source('",WD,"/ModelRun.r')",sep = '')));
 ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, 
           NumberOfModelRun, RandomMatrix, Cores, EcotypeID, EcotypeParameters, ModelSelect, CTR);
-write("Model run is finished...", file = ModelRunIndicatorPath, append = T)
+
+print(paste0("Model run is finished for calibrating ", calib_var," parameters ... Time: ",Sys.time()-time_test))
 
 #List every EvaluateFrame file in the output folder
 listEvalFrame <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("EvaluateFrame_",RoundOfGLUE,".txt"));
@@ -561,7 +572,7 @@ options(show.error.message=T)
 #}
 
 print(Sys.time()-time_test)
-
+print(paste0("Calibration ended at ", Sys.time()))
 },error = function(e) {
     fail_run<- paste0("\nAn error occurred during the calibration.\n")
     if(exists("errorMsg") == TRUE){
