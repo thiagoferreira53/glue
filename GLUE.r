@@ -251,7 +251,7 @@ BatchFileSetUp(WD, OD, CultivarBatchFile);
 write(c("DSSAT batch file =",CultivarBatchFile), file = ModelRunIndicatorPath, ncolumns=2, append = T);
 
 ## (7) Get the parameter property file (miminum, maximum, and flg values) and the number of parameters.
-CulFile.origin= readLines(paste0(GD,"/",GenotypeFileName,".CUL"), encoding="UTF-8")
+CulFile.origin= readLines(paste0(GD,"/",GenotypeFileName,".CUL"))#, encoding="UTF-8")
 
 if(length(grep("999991 MINIMA", CulFile.origin)) == 0){
   errorMsg <- "Lower bound (MINIMA) not specified in the cultivar file. Please correct the file."
@@ -353,7 +353,7 @@ write(c("Cultivar File Parameters =",Cul.ParameterNames), file = ModelRunIndicat
 if(EcotypeCalibration == "Y"){
   EcotypeID <- CulData$`ECO#`[3]
   
-  Eco.File.origin= readLines(paste0(GD,"/",GenotypeFileName,".ECO"), encoding="UTF-8")
+  Eco.File.origin= readLines(paste0(GD,"/",GenotypeFileName,".ECO"))#, encoding="UTF-8")
   
   if(length(grep("999991 MINIMA", Eco.File.origin)) == 0){
     errorMsg <- "Lower bound (MINIMA) not specified in the ecotype file. Please correct the file."
@@ -454,7 +454,7 @@ if(RoundOfGLUE == 1){
   calib_var <- "Growth"
 }
 
-print(paste0("GLUE Flag: ", RoundOfGLUE," - ", calib_var));
+print(paste0("GLUE Flag: ", calib_var));
 print(paste0("Model runs are starting..."));
 
 ## (2) Create new genotype files with the generated parameter sets and run the DSSAT model with them.
