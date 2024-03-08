@@ -1,20 +1,16 @@
 ####The main function to automatically realize the GLUE procedure for parameter estimation for DSSAT model.####
 time_test <- Sys.time()
 print(paste0("Calibration started at ", time_test))
-list.of.packages <- c("rjson", "parallel")
+
+#list.of.packages <- c("rjson", "parallel")
+list.of.packages <- c("parallel")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
 
-library(rjson)
+#library(rjson)
 library(parallel)
 
 #################Step 1: Get the fundamental information for GLUE procedure.##############
-#ncol(finf <- file.info(dir()))# at least six
-## Not run: finf # the whole list
-## Those that are more than 100 days old :
-#finf[difftime(Sys.time(), finf[,"mtime"], units="days") > 100 , 1:4]
-
-#file.info("no-such-file-exists")
 
 tryCatch({
 
@@ -29,12 +25,36 @@ tryCatch({
 WorkDirectory<-getwd();
 
 #read json file
-GLUE_defs <- fromJSON(file = paste0(WorkDirectory, "/GLUEDefs.json"))
+#GLUE_defs <- fromJSON(file = paste0(WorkDirectory, "/GLUEDefs.json"))
+#NumberOfModelRun <- as.numeric(GLUE_defs$NumberOfModelRun)
+#GLUEFlag <- as.numeric(GLUE_defs$GLUEFlag)
+#CultivarBatchFile<-GLUE_defs$CultivarBatchFile;
+#Cores <- GLUE_defs$Cores
+#EcotypeCalibration <- GLUE_defs$EcotypeCalibration
+#WD<- GLUE_defs$GLUED
+#OD<- GLUE_defs$OutputD
+#GD<- GLUE_defs$GenotypeD
+#DSSATD <- GLUE_defs$DSSATD
 
-CultivarBatchFile<-GLUE_defs$CultivarBatchFile;
+SimulationControl<-read.csv(paste0('/Users/thiagoferreira53/Projects/GLUE','/SimulationControl.csv'), header=T);
+NumberOfModelRun <- SimulationControl[SimulationControl$Variable == "NumberOfModelRun","Value"]
+GLUEFlag <- SimulationControl[SimulationControl$Variable == "GLUEFlag","Value"]
+CultivarBatchFile <- SimulationControl[SimulationControl$Variable == "CultivarBatchFile","Value"]
+Cores <- as.integer(SimulationControl[SimulationControl$Variable == "Cores","Value"])
+EcotypeCalibration <- SimulationControl[SimulationControl$Variable == "EcotypeCalibration","Value"]
+WD <- SimulationControl[SimulationControl$Variable == "GLUED","Value"]
+OD<- SimulationControl[SimulationControl$Variable == "OutputD","Value"]
+GD<- SimulationControl[SimulationControl$Variable == "GenotypeD","Value"]
+DSSATD <- SimulationControl[SimulationControl$Variable == "DSSATD","Value"]
+ModelID <- SimulationControl[SimulationControl$Variable == "ModelID","Value"]
 
-Cores <- GLUE_defs$Cores
-EcotypeCalibration <- GLUE_defs$EcoCalibration
+#add slash at the end to the path if missing
+WD <- ifelse(substr(WD, nchar(WD), nchar(WD)) != '/', paste0(WD,"/"), WD)
+OD <- ifelse(substr(OD, nchar(OD), nchar(OD)) != '/', paste0(OD,"/"), OD)
+GD <- ifelse(substr(GD, nchar(GD), nchar(GD)) != '/', paste0(GD,"/"), GD)
+DSSATD <- ifelse(substr(DSSATD, nchar(DSSATD), nchar(DSSATD)) != '/', paste0(DSSATD,"/"), DSSATD)
+
+
 
 #If "Cores "variable is not a number, it will assume the simulation will carried out on the 
 #HiPerGator (SLURM job scheduler) and use CORES specified in your bash file (.sh)
@@ -43,25 +63,7 @@ if(!is.numeric(Cores)){
   print(paste0("Cores being used: ",Cores))
 }
 
-#WorkDirectorySubstrings<-unlist(strsplit(WorkDirectory,"DSSAT48"));
-
-#DSSATD<-paste(WorkDirectorySubstrings[1],"DSSAT48", sep=""); #Get the working directory of DSSAT.
-
-#GLUED<-"/Tools/GLUE";#This one is the postion of GLUE under DSSAT and fixed by model developer.
-#OutputD<-"/GLWork"; #This one is the position of DSSAT output and fixed by model developer.
-#GenotypeD<-"/Genotype"; #This one is the position of Genotype file.
- 
-#WD<-paste(DSSATD, GLUED, sep="");
-#OD<-paste(DSSATD, OutputD, sep="");
-#GD<-paste(DSSATD, GenotypeD, sep="");
-
-WD<- GLUE_defs$GLUED
-OD<- GLUE_defs$OutputD
-GD<- GLUE_defs$GenotypeD
-#DSSATD <- paste0(WorkDirectory,GLUE_defs$DSSATD)
-DSSATD <- GLUE_defs$DSSATD
-
-eval(parse(text=paste("ModelRunIndicatorPath='",OD,"/ModelRunIndicator.txt'",sep = ''))); 
+eval(parse(text=paste("ModelRunIndicatorPath='",OD,"ModelRunIndicator.txt'",sep = ''))); 
 glueWarningLogFile <- file.path(OD, "GlueWarning.txt");
 glueExcludedModelListFile <- file.path(WD, "GlueExcludedModels.csv");
 ##Path of the model run indicator file, which indicates which component of GLUE is finished so far.
@@ -96,19 +98,14 @@ if(Cores > detectedCores){
 #eval(parse(text = paste("SimulationControl<-read.xls('",WD,
 #"/SimulationControl.xls',sheet = 'Sheet 1', rowNames = T, colNames=T)",sep = '')));
 
-eval(parse(text = paste("SimulationControl<-read.csv('",WD,
-"/SimulationControl.csv', header=T)",sep = '')));
 newRownames <- SimulationControl[ , 1];
 rownames(SimulationControl) <- newRownames;
 
-#NumberOfModelRun<-as.numeric(SimulationControl["NumberOfModelRun", "Value"]);
-NumberOfModelRun <- as.numeric(GLUE_defs$NumberOfModelRun)
+NumberOfModelRun<-as.numeric(SimulationControl["NumberOfModelRun", "Value"]);
 write(c("The number of model runs = ",NumberOfModelRun), file = ModelRunIndicatorPath, ncolumns=2, append = F);
 
-#print(NumberOfModelRun);
 #Read the number of model running.
 #GLUEFlag<-as.numeric(SimulationControl[2,"Value"]);
-GLUEFlag <- as.numeric(GLUE_defs$GLUEFlag)
 
 #Set the flag for whole GLUE procedure. If GLUEFlag==1, it means coefficients relative both to phenology and
 #growth will be evaluated; GLUEFlag==2, only phenology will be evaluated; GLUEFlag==3, only growth will be evaluated.
@@ -141,7 +138,7 @@ write("GLUE will run for growth only.", file = ModelRunIndicatorPath, append = T
 #second round GLUE will be conducted.
 
 ## (5) Get the  name of the genotype file of current crop and the name of current model
-eval(parse(text=paste("BatchFile<-readLines('",OD,"/",CultivarBatchFile,"',n=-1)",sep = '')));
+eval(parse(text=paste("BatchFile<-readLines('",OD,CultivarBatchFile,"',n=-1)",sep = '')));
 CropNameAddress<-grep('BATCH', BatchFile);
 CropNameStart<-18; #
 CropNameEnd<-19; #
@@ -158,36 +155,9 @@ CultivarNameEnd<-nchar(BatchFile[CropNameAddress]); #Get the Cultivar name such 
 CultivarID<-substr(BatchFile[CropNameAddress], CultivarIDStart, CultivarIDEnd);
 CultivarName<-substr(BatchFile[CropNameAddress], CultivarNameStart, CultivarNameEnd);
 write(c("Cultivar ID =",CultivarName), file = ModelRunIndicatorPath, ncolumns=2, append = T);
-#Get the cultivar ID and name.
-## "$BATCH(CULTIVAR):MZIM0003 APPOLO" is an example to show how to get the crop name and cultivar ID. 
-##From this line, we can get to know the crop name "MZ" (18-19), the cultivar ID "IM0003" (20-25).
-
-# Model name
-
-# detect OS 
-# ...
-
-#Old code that used to modify the selected model on the DSSAPRO file
-#DSSATPro = readLines(paste0(DSSATD,"/DSSATPRO.L48"))
-#LineNo = grep(paste0("M",CropName),DSSATPro)
-#LineSplit = unlist(strsplit(DSSATPro[LineNo]," "))
-#ModelSelect = LineSplit[length(LineSplit)]
-#if(GLUE_defs$ModelID!=ModelSelect && GLUE_defs$ModelID!=""){
-#  write(paste0("The requested model (",GLUE_defs$ModelID,") does not match with the model in DSSATPRO.L48 (",ModelSelect,"); 
-#  DSSATPRO.L48 was updated to properly run the cultivar calibration."), file = ModelRunIndicatorPath, ncolumns=2, append = T);
-#  LineSplit[length(LineSplit)] <- GLUE_defs$ModelID
-#  DSSATPro[LineNo] <- paste(LineSplit, collapse=' ')
-#  writeLines(DSSATPro,paste0(DSSATD,"/DSSATPRO.L48"))
-#  ModelSelect <- GLUE_defs$ModelID
-#}
-
-#Using the DSCSM048.CTR for dynamically changing the simulation controls.
-#The file must be in the same folder as the executable.
-
-#Read the GLUE DSCSM048.CTR template
 
 
-CTR_file_GLUE <- readLines(paste0(WD,"/DSSCTR.template"))
+CTR_file_GLUE <- readLines(paste0(WD,"DSSCTR.template"))
 
 #Check if there is already a DSCSM048.CTR inside the folder and save it.
 
@@ -203,11 +173,11 @@ LineNo <- grep("GLUEModel", CTR)
 
 LineSplit = unlist(strsplit(CTR[LineNo]," "))
 
-LineSplit[length(LineSplit)] <- gsub("\\d+", "",GLUE_defs$ModelID)
+LineSplit[length(LineSplit)] <- gsub("\\d+", "",ModelID)
 CTR[LineNo] <- paste(LineSplit, collapse=' ')
 #writeLines(CTR,paste0(DSSATD,"/DSCSM048.CTR"))
 
-ModelSelect <- GLUE_defs$ModelID
+ModelSelect <- ModelID
 
 write(c("Model Name =",ModelSelect), file = ModelRunIndicatorPath, ncolumns=2, append = T);
 
@@ -225,7 +195,7 @@ if (CropName %in% excludedFile.df[which(substr(ModelSelect,1,5) == excludedFile.
 
 # Get the genotype file name
 GenotypeFilePath<-GD;
-CurrentGenotypeFile<-paste0(GD, "/",CropName,substr(ModelSelect,3,8),".CUL")
+CurrentGenotypeFile<-paste0(GD,CropName,substr(ModelSelect,3,8),".CUL")
 
 #Get the names of the genotype file template that will be used, which shoud start with crop name such as "MZ",
 #and end with extension name ".CUL". Since there are two genotype files starting with "MZ" and ending with
@@ -246,12 +216,12 @@ write(c("Genotype file name =",GenotypeFileName), file = ModelRunIndicatorPath, 
 ##to the batch file template "DSSBatch.template". Thus a new batch file can be generated and save it as
 ##"DSSBatch.v48" in the output directory.
 
-eval(parse(text=paste("source('",WD,"/BatchFileSetUp.r')",sep = '')));
+eval(parse(text=paste("source('",WD,"BatchFileSetUp.r')",sep = '')));
 BatchFileSetUp(WD, OD, CultivarBatchFile);
 write(c("DSSAT batch file =",CultivarBatchFile), file = ModelRunIndicatorPath, ncolumns=2, append = T);
 
 ## (7) Get the parameter property file (miminum, maximum, and flg values) and the number of parameters.
-CulFile.origin= readLines(paste0(GD,"/",GenotypeFileName,".CUL"))#, encoding="UTF-8")
+CulFile.origin= readLines(paste0(GD,GenotypeFileName,".CUL"))#, encoding="UTF-8")
 
 if(length(grep("999991 MINIMA", CulFile.origin)) == 0){
   errorMsg <- "Lower bound (MINIMA) not specified in the cultivar file. Please correct the file."
@@ -287,48 +257,6 @@ if(length(LineNo.cal)>1){
 CulFile = CulFile[LineNo.all]
 write(c("Parameter property:",CulFile ), file = ModelRunIndicatorPath, append = T);
 
-# discard content after !, and remove the extra space at the end of lines
-# LineNo.exc = grep("!",CulFile)
-# 
-# 
-# # if (length(LineNo.exc)>1){
-# #   
-# #   for (itemp in 1:length(LineNo.exc)-1){
-# #     
-# #     ExcSplit = unlist(strsplit(CulFile[LineNo.exc[itemp]],"!"))
-# #     
-# #   }
-#   
-#   
-#   # for (itemp in 1:length(LineNo.exc)-1){
-#   #   
-#   #   ExcSplit = unlist(strsplit(CulFile[LineNo.exc[itemp]],"!"))
-#   #   CulFile[LineNo.exc[itemp]] = ExcSplit[1]
-#   #   
-#   #   Loc.space = unlist(stringr::str_locate_all(ExcSplit[1]," "))
-#   #   
-#   #   for (iLoc in length(Loc.space):1) {
-#   #     
-#   #     if(Loc.space[iLoc]-Loc.space[iLoc-1] > 1){
-#   #       
-#   #       No.space = length(Loc.space) - iLoc + 1
-#   #       break
-#         
-#       } else {
-#         
-#         No.space = 0
-#         
-#       }
-#       
-#     }
-#     CulFile[LineNo.exc[itemp]] = substr(ExcSplit[1],1,nchar(ExcSplit[1])-No.space)
-#     
-#     # print(No.space)
-#     # print(CulFile)
-#   }
-#   
-# }
-
 # convert text to dataframe
 CulFile.df = paste0(substr(CulFile,1,6), substr(CulFile,30,nchar(CulFile)[1]))
 Cul.Header = unlist(strsplit(CulFile.df[2],split="(\\s|\\|)+"))
@@ -353,7 +281,7 @@ write(c("Cultivar File Parameters =",Cul.ParameterNames), file = ModelRunIndicat
 if(EcotypeCalibration == "Y"){
   EcotypeID <- CulData$`ECO#`[3]
   
-  Eco.File.origin= readLines(paste0(GD,"/",GenotypeFileName,".ECO"))#, encoding="UTF-8")
+  Eco.File.origin= readLines(paste0(GD,GenotypeFileName,".ECO"))#, encoding="UTF-8")
   
   if(length(grep("999991 MINIMA", Eco.File.origin)) == 0){
     errorMsg <- "Lower bound (MINIMA) not specified in the ecotype file. Please correct the file."
@@ -441,7 +369,7 @@ for (i in StartRoundOfGLUE:TotalRoundOfGLUE)
 RoundOfGLUE<-i;
 
 ## (1) Generate random values for the paramter set concerned.
-eval(parse(text = paste("source('",WD,"/RandomGeneration.r')",sep = '')));
+eval(parse(text = paste("source('",WD,"RandomGeneration.r')",sep = '')));
 RandomMatrix<-RandomGeneration(WD,DataColumns, TotalParameterNumber, ncol.predefined,NumberOfModelRun, RoundOfGLUE, GLUEFlag);
 write(paste0("GLUE Flag: ", RoundOfGLUE), file = ModelRunIndicatorPath, append = T);
 write("Random parameter sets have been generated...", file = ModelRunIndicatorPath, append = T);
@@ -458,11 +386,12 @@ print(paste0("GLUE Flag: ", calib_var));
 print(paste0("Model runs are starting..."));
 
 ## (2) Create new genotype files with the generated parameter sets and run the DSSAT model with them.
-eval(parse(text = paste("source('",WD,"/ModelRun.r')",sep = '')));
+eval(parse(text = paste("source('",WD,"ModelRun.r')",sep = '')));
 ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, 
           NumberOfModelRun, RandomMatrix, Cores, EcotypeID, EcotypeParameters, ModelSelect, CTR);
 
 print(paste0("Model run is finished for calibrating ", calib_var," parameters ... Time: ",Sys.time()-time_test))
+print(paste0("Initializing evaluation for ", calib_var," parameters ... Time: ",Sys.time()-time_test))
 
 #List every EvaluateFrame file in the output folder
 listEvalFrame <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("EvaluateFrame_",RoundOfGLUE,".txt"));
@@ -555,6 +484,7 @@ if (RoundOfGLUE==1)
   Indicator<-'The second round of GLUE is finished.';
   write(Indicator, file = ModelRunIndicatorPath, append = T);
 }
+print(paste0("Finalizing evaluation for ", calib_var," parameters ... Time: ",Sys.time()-time_test))
 }
 
 #################Step 3: Get a final optimal parameter set.############## 

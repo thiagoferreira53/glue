@@ -39,7 +39,7 @@ process.
 
 How to use it:
 
-- Create a "GLUEDefs.json" file. This is a configuration file for running GLUE. Find below the required structure 
+- Create a "SimulationControl.csv" file. This is a configuration file for running GLUE. Find below the required structure 
   for the file.
 
 - Create a C file (similar to a batch file) and put it in your working directory. 
@@ -66,11 +66,11 @@ How to use it:
   AT THE START OF A NEW CULTIVAR CALIBRATION. MAKE SURE TO MOVE ANY PREVIOUS RESULTS TO THE BackUp folder 
   **********************************************************************************************************************
   
-*GLUEDefs.json File Structure:
+*SimulationControl.csv file Structure:
  | CultivarBatchFile - Define the file C (batch) to be used (the file should be located inside the GLWork/working directory).
  | ModelID - Inform which model should be used for the calibration (Tip: All model IDs can be found in the DSCSM048.CTR).
- | EcoCalibration - Indicates if GLUE should also calibrate the coefficients on the respective ecotype (.ECO) file. 
-                    EcoCalibration = "Y" indicates that GLUE should also calibrate the Ecotype coefficients for this 
+ | EcotypeCalibration - Indicates if GLUE should also calibrate the coefficients on the respective ecotype (.ECO) file. 
+                    EcotypeCalibration = "Y" indicates that GLUE should also calibrate the Ecotype coefficients for this 
                     cultivar. The .ECO file MUST be well structured with "MAXIMA" and "MINIMA" and each coefficient
                     MUST contain a header indicating whether it is associated with phenology ("P"), growth ("G"), or 
                     not applicable ("N").
@@ -92,7 +92,7 @@ How to use it:
            **We do not recommend the use of all available cores in your machine for running GLUE.**
 
   **IMPORTANT**
-  - Do not add "/" at the end of each path in the GLUEDefs.json;
+  - It is not necessary to add "/" at the end of each path in the SimulationControl.csv;
   - The size of the soil profile file (e.g. .SOL) has an impact in the time required to run the cultivar calibration.
     It is recommended to create a soil file with only the profiles being used during the calibration;
 
