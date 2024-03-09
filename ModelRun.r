@@ -1,5 +1,7 @@
 library(parallel)
 
+progress <- TRUE
+
 ##This is the function to run the DSSAT model.
 ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, 
                    NumberOfModelRun, RandomMatrix, CoresAvailable, EcotypeID, EcotypeParameters, ModelSelect, CTR)
@@ -100,6 +102,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
       RealRandomSets<-RandomMatrix[ParameterSetIndex,];
       eval(parse(text = paste("write(t(RealRandomSets), file = '",core_dir_name,"/RealRandomSets_2.txt',,append = T, ncolumns =TotalParameterNumber)",sep = '')));
     }
+    
 
   }
     
@@ -111,7 +114,19 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
     clusterExport(NULL, c('ModelSelect', 'run_simulations','WD', 'OD', 'DSSATD', 'GD', 'CropName', 
                           'GenotypeFileName', 'CultivarID', 'RoundOfGLUE', 'TotalParameterNumber', 
                           'NumberOfModelRun', 'RandomMatrix', 'EcotypeID', 'EcotypeParameters'))
-    parLapply(NULL, ListModelRun, function(z) run_simulations(z))
+
+    if(progress==TRUE){
+      
+      list.of.packages <- c("pbapply")
+      new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+      if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
+      library(pbapply)
+      
+      pbo = pboptions(type="txt")
+      system.time(pblapply(ListModelRun, function(z) run_simulations(z), cl = cl))
+    }else{
+      parLapply(NULL, ListModelRun, function(z) run_simulations(z))
+    }
     stopCluster(cl)
 
 }

@@ -1,6 +1,6 @@
 Variable,Value
-NumberOfModelRun,8
-GLUEFlag,2
+NumberOfModelRun,100
+GLUEFlag,1
 CultivarBatchFile,DEKALB_52-59_AF.MZC
 ModelID,MZCER048
 GLUED,/Users/thiagoferreira53/Projects/GLUE
