@@ -122,7 +122,6 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
     if(!dir.exists(core_dir_name)){
       dir.create(core_dir_name)
       write('',paste0(core_dir_name,'/Evaluate_output.txt'))
-      write('',paste0(core_dir_name,'/Error_list_',Sys.getpid(),'.txt'))
       file.copy(paste0(OD,'/DSSBatch.v48'), core_dir_name)
       file.copy(paste0(GD,'/',GenotypeFileName,'.CUL'), core_dir_name)
       file.copy(paste0(GD,'/',GenotypeFileName,'.ECO'), core_dir_name) #added to run on HiPerGator
@@ -151,6 +150,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
     #Call the batch file to run the model.
     if (file.exists("Evaluate.OUT")== F)
     {
+      write('',paste0(core_dir_name,'/Error_list_',Sys.getpid(),'.txt'))
       cat(paste0("An error occurred in ", core_dir_name, " when using the following cultivar coefficients:\n"), file = paste0(core_dir_name,"/Error_list_",Sys.getpid(),".txt"),append = T)
       eval(parse(text = paste("cat(",list(RandomMatrix[ModelRunNumber,(1:(TotalParameterNumber -EcotypeParameters))]),", file = '",core_dir_name,"/Error_list_",Sys.getpid(),".txt',append = T)",sep = '')));
       #next;
@@ -188,6 +188,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
         ParameterSetIndex<-c(ParameterSetIndex,i);
         #Select the parameter set that match the requirement, i.e. do not have bad outputs.            
       }else{
+      write('',paste0(core_dir_name,'/Error_list_',Sys.getpid(),'.txt'))
       cat(paste0("Missing values found in ", core_dir_name, " when using the following combination of cultivar coefficients:\n"), file = paste0(core_dir_name,"/Error_list_",Sys.getpid(),".txt"),append = T)
       eval(parse(text = paste("cat(",list(RandomMatrix[ModelRunNumber,(1:(TotalParameterNumber -EcotypeParameters))]),'\n',", file = '",core_dir_name,"/Error_list_",Sys.getpid(),".txt',append = T)",sep = '')));
         if(EcotypeParameters>0){

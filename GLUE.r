@@ -453,13 +453,15 @@ for (Rand_out in RealRandomSetsFiles){
 
 eval(parse(text = paste('write(RealRandomSetsFrame, "',OD,'/RealRandomSets_',RoundOfGLUE,'.txt", append = T)',sep="")))
 
-for (Error_out in ErrorFiles){
-  eval(parse(text=paste("FileError<-suppressWarnings({readLines('",Error_out,"',n=-1)})",sep = '')));
-  ErrorFrame=append(ErrorFrame,FileError); 
+print(ErrorFiles)
+if(length(ErrorFiles) > 0){
+  for (Error_out in ErrorFiles){
+    eval(parse(text=paste("FileError<-suppressWarnings({readLines('",Error_out,"',n=-1)})",sep = '')));
+    ErrorFrame=append(ErrorFrame,FileError); 
+  }
+
+eval(parse(text = paste('write(ErrorFrame, "',OD,'/ErrorFrame.txt", append = T)',sep="")))
 }
-
-eval(parse(text = paste('write(ErrorFrame, "',OD,'/ErrorFrame_',RoundOfGLUE,'.txt", append = T)',sep="")))
-
 write("Likelihood calculation is starting...", file = ModelRunIndicatorPath, append = T);
 
 ## (3) Calculate the likelihood values for each parameter set.
