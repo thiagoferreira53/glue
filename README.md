@@ -13,6 +13,7 @@
 #####################################################################################################################
 #Contact Information:
 #Thiago Berton Ferreira   <t.berton@ufl.edu>
+#Vakthang Shelia          <vakhtang.shelia@ufl.edu>
 #Gerrit Hoogenboom        <gerrit@ufl.edu>
 #Cheryl Porter            <cporter@ufl.edu>
 #####################################################################################################################

@@ -1,6 +1,6 @@
 library(parallel)
 
-progress <- TRUE
+progress <- FALSE
 
 # Custom version of pbapply (library pbapply) for writing the calibration status on "progess.txt"
 pbapply_custom <- function (X, FUN, ..., cl = NULL) 
@@ -142,7 +142,7 @@ ModelRun<-function(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, R
     #cat(RandomMatrix[ModelRunNumber,])
     #check which OS GLUE is running in order to run the simulations
     if(.Platform$OS.type == "windows"){
-      eval(parse(text = paste("try(system('",DSSATD,"/DSCSM048.EXE ",ModelSelect," B ",OD,"/DSSBatch.v48 DSCSM048.CTR'))",sep = '')));
+      eval(parse(text = paste("try(system('",DSSATD,"/DSCSM048.EXE ",ModelSelect," B ",OD,"DSSBatch.v48 DSCSM048.CTR'))",sep = '')));
     }else{
       eval(parse(text = paste("try(system('",DSSATD,"/dscsm048 ",ModelSelect," B ","DSSBatch.v48 DSCSM048.CTR'))",sep = '')));
     }

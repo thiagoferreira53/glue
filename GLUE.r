@@ -36,7 +36,7 @@ WorkDirectory<-getwd();
 #GD<- GLUE_defs$GenotypeD
 #DSSATD <- GLUE_defs$DSSATD
 
-SimulationControl<-read.csv(paste0('/Users/thiagoferreira53/Projects/GLUE','/SimulationControl.csv'), header=T);
+SimulationControl<-read.csv(paste0(WorkDirectory,'/SimulationControl.csv'), header=T);
 NumberOfModelRun <- SimulationControl[SimulationControl$Variable == "NumberOfModelRun","Value"]
 GLUEFlag <- SimulationControl[SimulationControl$Variable == "GLUEFlag","Value"]
 CultivarBatchFile <- SimulationControl[SimulationControl$Variable == "CultivarBatchFile","Value"]
@@ -394,28 +394,28 @@ print(paste0("Model run is finished for calibrating ", calib_var," parameters ..
 print(paste0("Initializing evaluation for ", calib_var," parameters ... Time: ",Sys.time()-time_test))
 
 #List every EvaluateFrame file in the output folder
-listEvalFrame <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("EvaluateFrame_",RoundOfGLUE,".txt"));
+listEvalFrame <- dir(gsub("/$", "", OD), recursive=TRUE, full.names=TRUE, pattern=paste0("EvaluateFrame_",RoundOfGLUE,".txt"));
 
 #Select only EvaluateFrame files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
-EvaluateFiles <- listEvalFrame[grepl(paste0(OD,"/core"), listEvalFrame)]
+EvaluateFiles <- listEvalFrame[grepl(paste0(OD,"core"), listEvalFrame)]
 
 #List every Evaluate_output.txt in the output folder
-listEvaluateOut <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Evaluate_output.txt"));
+listEvaluateOut <- dir(gsub("/$", "", OD), recursive=TRUE, full.names=TRUE, pattern=paste0("Evaluate_output.txt"));
 
 #Select only Evaluate_output.txt files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
-EvaluateOutTxt <- listEvaluateOut[grepl(paste0(OD,"/core"), listEvaluateOut)]
+EvaluateOutTxt <- listEvaluateOut[grepl(paste0(OD,"core"), listEvaluateOut)]
 
 #List every RealRandomSets file in the output folder
-listRealRandomSets <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("RealRandomSets_",RoundOfGLUE,".txt"));
+listRealRandomSets <- dir(gsub("/$", "", OD), recursive=TRUE, full.names=TRUE, pattern=paste0("RealRandomSets_",RoundOfGLUE,".txt"));
 
 #Select only RealRandomSets files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
-RealRandomSetsFiles <- listRealRandomSets[grepl(paste0(OD,"/core"), listRealRandomSets)]
+RealRandomSetsFiles <- listRealRandomSets[grepl(paste0(OD,"core"), listRealRandomSets)]
 
 #List every Error_list file in the output folder
-listErrorFrame <- dir(OD, recursive=TRUE, full.names=TRUE, pattern=paste0("Error_list_*"));
+listErrorFrame <- dir(gsub("/$", "", OD), recursive=TRUE, full.names=TRUE, pattern=paste0("Error_list_*"));
 
 #Select only Error_list files in "core..." folders to avoid mixing with results from previous runs contained inside the BackUp folder
-ErrorFiles <- listErrorFrame[grepl(paste0(OD,"/core"), listErrorFrame)]
+ErrorFiles <- listErrorFrame[grepl(paste0(OD,"core"), listErrorFrame)]
 
 EvaluateFrameData <- c();
 
@@ -453,7 +453,6 @@ for (Rand_out in RealRandomSetsFiles){
 
 eval(parse(text = paste('write(RealRandomSetsFrame, "',OD,'/RealRandomSets_',RoundOfGLUE,'.txt", append = T)',sep="")))
 
-print(ErrorFiles)
 if(length(ErrorFiles) > 0){
   for (Error_out in ErrorFiles){
     eval(parse(text=paste("FileError<-suppressWarnings({readLines('",Error_out,"',n=-1)})",sep = '')));
