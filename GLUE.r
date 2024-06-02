@@ -8,6 +8,8 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 if(length(new.packages)) install.packages(new.packages, repos = "http://cran.us.r-project.org")
 
 #library(rjson)
+
+parallel_available <- require("parallel")
 library(parallel)
 
 #################Step 1: Get the fundamental information for GLUE procedure.##############
@@ -64,14 +66,20 @@ if(!is.numeric(Cores)){
 }
 
 eval(parse(text=paste("ModelRunIndicatorPath='",OD,"ModelRunIndicator.txt'",sep = ''))); 
+if(parallel_available == FALSE) {
+  write("Missing parallel library required for cultivar calibration.", file = ModelRunIndicatorPath, append = T);
+  return()
+}
+
 glueWarningLogFile <- file.path(OD, "GlueWarning.txt");
 glueExcludedModelListFile <- file.path(WD, "GlueExcludedModels.csv");
 ##Path of the model run indicator file, which indicates which component of GLUE is finished so far.
 
-#command to clean the GLWork directory -- removes everything but the folder BackUp and batch file
+#command to clean the working directory (Usually GLWork) -- removes everything but the folder BackUp and batch file
+#included GLWork.txt as GLUESelect needs this file
 if(OD != WD){
 unlink(setdiff(list.files(OD, full.names = TRUE), 
-                    list.files(OD, pattern='*C$|BackUp|dscsm048', full.names = TRUE)), 
+                    list.files(OD, pattern='*C$|BackUp|dscsm048|GLWork.txt|GLwork.txt', full.names = TRUE)), 
             recursive = TRUE)
 }else{
   warningMsg <- "The output folder cannot be the same as the GLUE working directory. Please inform a different output folder path."
@@ -504,6 +512,10 @@ options(show.error.message=T)
 
 print(Sys.time()-time_test)
 print(paste0("Calibration ended at ", Sys.time()))
+
+#print("Cleaning the work directory.")
+#unlink(list.files(OD, pattern='core_*', full.names = TRUE),recursive = TRUE)
+
 },error = function(e) {
     fail_run<- paste0("\nAn error occurred during the calibration.\n")
     if(exists("errorMsg") == TRUE){
