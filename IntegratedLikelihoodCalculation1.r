@@ -62,7 +62,7 @@ RowNames<-rownames(VAR);
 
 NumberOfMeasurement<-dim(VAR)[1];
 
-if (CropName=="BA" || CropName=="RI" || CropName=="WH")
+if (CropName=="BA" || CropName=="RI" || CropName=="WH" || CropName=="TF")
 {
   VAR["PD1T","Flag"]<-0;
   VAR["PWAM","Flag"]<-0;
