@@ -60,7 +60,7 @@ DSSATD <- ifelse(substr(DSSATD, nchar(DSSATD), nchar(DSSATD)) != '/', paste0(DSS
 
 #If "Cores "variable is not a number, it will assume the simulation will carried out on the 
 #HiPerGator (SLURM job scheduler) and use CORES specified in your bash file (.sh)
-if(!is.numeric(Cores)){
+if(!is.numeric(Cores) | is.na(Cores)){
   Cores = as.integer(Sys.getenv("SLURM_CPUS_ON_NODE"))
   print(paste0("Cores being used: ",Cores))
 }
@@ -398,7 +398,7 @@ eval(parse(text = paste("source('",WD,"ModelRun.r')",sep = '')));
 ModelRun(WD, OD, DSSATD, GD, CropName, GenotypeFileName, CultivarID, RoundOfGLUE, TotalParameterNumber, 
           NumberOfModelRun, RandomMatrix, Cores, EcotypeID, EcotypeParameters, ModelSelect, CTR);
 
-print(paste0("Model run is finished for calibrating ", calib_var," parameters ... Time: ",Sys.time()-time_test))
+print(paste0("GLUE has finished calibrating the ", calib_var," parameters ... Time: ",Sys.time()-time_test))
 print(paste0("Initializing evaluation for ", calib_var," parameters ... Time: ",Sys.time()-time_test))
 
 #List every EvaluateFrame file in the output folder
