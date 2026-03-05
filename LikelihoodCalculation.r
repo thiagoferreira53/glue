@@ -38,21 +38,27 @@ eval(parse(text = paste('ProbabilityTreatment',i,'[,j]<-IntegratedLikelihoodTrea
 }
 
 # Step 3. Calculate the combined probability or normalized likelihood values for all treatments.
+# Use log-space arithmetic to avoid numerical underflow when multiplying very small probabilities
+# across many treatments (log-sum-exp).
+
+LogCombinedProbability <- rep(0, nrow(ProbabilityTreatment1));
 
 for (i in 1:TreatmentNumber)
 {
- if(i==1)
-  {
-  CombinedProbability<-ProbabilityTreatment1[,"IntegratedCombinedLikelihood"];#For the first treatment.
-  } else
-  {
-  eval(parse(text = paste('CombinedProbability<-CombinedProbability*ProbabilityTreatment',i, #For other treatments.
+  eval(parse(text = paste('currentProb <- ProbabilityTreatment',i,
   '[,"IntegratedCombinedLikelihood"]',sep="")));
-##Calculate the combined probability values for all of the treatments.
-  }
+
+  # Replace zeros with a very small number to avoid log(0) = -Inf
+  currentProb[currentProb <= 0] <- .Machine$double.xmin;
+
+  LogCombinedProbability <- LogCombinedProbability + log(currentProb);
+  ##Summing log-probabilities is equivalent to multiplying probabilities, but avoids underflow.
 }
 
-Probability<-CombinedProbability/sum(CombinedProbability);
+# Normalize using log-sum-exp trick: subtract the max for numerical stability, then exponentiate.
+LogMax <- max(LogCombinedProbability);
+Probability <- exp(LogCombinedProbability - LogMax);
+Probability <- Probability / sum(Probability);
 
 #Calculate the normalized probability values for each of the random parameter sets.
 

@@ -7,6 +7,13 @@ eval(parse(text = paste('RandomAndProbability<-read.table("',OD,
 '/RandomParameterSetsAndProbability_',RoundOfGLUE,'.txt",header=TRUE,comment.char="")',sep="")));
 #print(RandomAndProbability);
 
+#Step 1.1. Check for NA or invalid probabilities before proceeding.
+if(all(is.na(RandomAndProbability[,"Probability"]))) {
+  warning("All probability values are NA in RandomParameterSetsAndProbability_", RoundOfGLUE,
+          ".txt. Likelihood calculation may have failed. Cannot compute posterior distribution.")
+  return(invisible(NULL))
+}
+
 #Step 2. Derive the mean and variance values of the posterior distribution.
 ParameterNumber<-length(ParameterNames);
 
