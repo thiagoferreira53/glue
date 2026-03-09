@@ -33,6 +33,8 @@ for (j in 2:ColumnNumber[2])
 eval(parse(text = paste('ProbabilityTreatment',i,'[,j]<-IntegratedLikelihoodTreatment',i,
 '[,j]/sum(IntegratedLikelihoodTreatment',i,'[,j])',sep="")));
 }
+# Replace NaN values that result from all-zero columns (0/0) with 0.
+eval(parse(text = paste('ProbabilityTreatment',i,'[is.nan(as.matrix(ProbabilityTreatment',i,'))]<-0',sep="")));
 ##Calculate the probability or normalized likelihood values for each observation.
 
 }
@@ -48,8 +50,8 @@ for (i in 1:TreatmentNumber)
   eval(parse(text = paste('currentProb <- ProbabilityTreatment',i,
   '[,"IntegratedCombinedLikelihood"]',sep="")));
 
-  # Replace zeros with a very small number to avoid log(0) = -Inf
-  currentProb[currentProb <= 0] <- .Machine$double.xmin;
+  # Replace zeros, NaN and NA with a very small number to avoid log(0)=-Inf or log(NA)=NA
+  currentProb[is.na(currentProb) | is.nan(currentProb) | currentProb <= 0] <- .Machine$double.xmin;
 
   LogCombinedProbability <- LogCombinedProbability + log(currentProb);
   ##Summing log-probabilities is equivalent to multiplying probabilities, but avoids underflow.
